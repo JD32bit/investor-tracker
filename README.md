@@ -2,6 +2,15 @@
 
 ![Investor Tracker](images/investor-tracker.png)
 
+
+<div align="center">
+  
+[![Try Live Demo](https://img.shields.io/badge/Try%20Live%20Demo-Click%20Here-blue?style=for-the-badge)](https://jd32bit.github.io/investor-tracker/InvestorTracker.html)
+
+*Or visit: https://jd32bit.github.io/investor-tracker/InvestorTracker.html*
+
+</div>
+
 **Lightweight Investor CRM for Founders** - Track outreach, manage follow-ups, zero setup required.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://jd32bit.github.io/investor-tracker/InvestorTracker.html)
