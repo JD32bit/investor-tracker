@@ -4,7 +4,7 @@
 
 **Lightweight Investor CRM for Founders** - Track outreach, manage follow-ups, zero setup required.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://jd32bit.github.io/investor-tracker/)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://jd32bit.github.io/investor-tracker/InvestorTracker.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Made with HTML5](https://img.shields.io/badge/Made%20with-HTML5-E34F26?logo=html5)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 
