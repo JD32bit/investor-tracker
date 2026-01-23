@@ -1,0 +1,4 @@
+Name,Location,Type,Check-Size,Priority,Status,Next Action,Next Date,Interest,Primary Contact,Secondary Contact,Email,Website,Intro Source,Connection Strength,Why Them,First Contact Date,Last Contact Date,Meeting Date/Time,Key Concerns,Docs Sent,Verbal Commit,Notes
+"ABC","XXX","Angel Investor","111","A","STATUS_1","Research investor","2026-02-01","High","PERSON_A","PERSON_B","a@abc.xyz","https://abc.xyz","None","Cold","","2026-01-18","2026-01-18","CONCERN_1","","","No",""
+"LMN","YYY","Seed Fund","222","B","STATUS_2","Get warm intro","2026-01-28","Medium","PERSON_A","PERSON_B","b@lmn.xyz","https://lmn.xyz","COLD","Cold","","2026-01-20","2026-01-20","","CONCERN_2","DOC_2","Yes",""
+"XYZ","ZZZ","Family Office","333","A","STATUS_3","Send follow-up #2","2026-02-05","Low","PERSON_C","PERSON_D","c@xyz.xyz","https://xyz.xyz","none","Cold","2026-01-08","2026-01-22","2026-01-23","","","NOTE_3","No",""
