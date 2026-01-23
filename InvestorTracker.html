@@ -1,0 +1,1044 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Investment Tracker</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+.container { max-width: 1400px; margin: auto; }
+h1 { color: #1e3a8a; font-size: 2rem; margin-bottom: 20px; }
+.buttons { 
+  display: flex; 
+  justify-content: space-between; /* Space between left and right */
+  align-items: center;
+  margin-bottom: 20px; 
+  flex-wrap: wrap; 
+}
+.button { 
+  padding: 8px 14px; 
+  border: none; 
+  border-radius: 5px; 
+  color: white; 
+  cursor: pointer; 
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+}
+.button-blue { background: #2563eb; }
+.button-blue:hover { background: #1d4ed8; }
+
+.button-green { background: #16a34a; }
+.button-green:hover { background: #15803d; }
+
+.button-orange { background: #ea580c; }
+.button-orange:hover { background: #c2410c; }
+
+.button-purple { background: #9333ea; }
+.button-purple:hover { background: #7e22ce; }
+
+.button-red { background: #dc2626; }
+.button-red:hover { background: #b91c1c; }
+
+/* Dashboard */
+.dashboard { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+.dash-card { background:#fff; padding:10px 15px; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,0.1); text-align:center; min-width:120px; }
+.dash-card .title { font-size:12px; color:#555; }
+.dash-card .value { font-size:20px; font-weight:bold; margin-top:4px; }
+
+/* Table */
+.table-container { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+th, td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; text-align: left; position: relative; font-size: 13px; }
+th { background: #f3f4f6; font-weight: bold; position: sticky; top: 0; z-index: 1; }
+tr:hover { background: #f9fafb; }
+input, select, textarea { width: 100%; padding:8px; margin-bottom:10px; border-radius:4px; border:1px solid #ccc; }
+
+/* Modal */
+.modal { display: none; position: fixed; inset:0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
+.modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 800px; max-height: 80vh; overflow-y: auto; }
+.modal-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; }
+.modal-header h2 { margin:0; }
+.close-btn { cursor:pointer; font-weight:bold; color:#dc2626; }
+
+/* Notes */
+.note-list { max-height:150px; overflow-y:auto; border:1px solid #ccc; padding:8px; border-radius:4px; background:#f9fafb; margin-bottom:10px; }
+.note-item { font-size:0.9rem; margin-bottom:5px; border-bottom:1px solid #e5e7eb; padding-bottom:3px; display:flex; justify-content:space-between; }
+.remove-note { cursor:pointer; color:#dc2626; font-weight:bold; margin-left:10px; }
+.note-preview { display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,0.1); white-space: pre-wrap; z-index:10; width:300px; }
+td:hover .note-preview { display:block; }
+
+/* Priority colors */
+.priority-A { background: #4caf50; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+.priority-B { background: #ffeb3b; color: #555; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+.priority-C { background: #9e9e9e; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+
+/* Interest colors */
+.interest-High { background: #4caf50; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+.interest-Medium { background: #ff9800; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+.interest-Low { background: #f44336; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+.interest-Passed { background: #9e9e9e; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-align:center; }
+
+.notes-cell {
+  max-width: 250px; /* make column wider if you want */
+  max-height: 50px; /* limit height */
+  overflow-y: auto;  /* vertical scroll */
+  word-wrap: break-word; /* break long notes */
+  padding: 5px;
+  border-radius: 4px;
+  background: #f9fafb;
+  font-size: 0.9rem;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.icon-btn svg {
+  vertical-align: middle;
+}
+
+/* Individual colors */
+.icon-view { color: #16a34a; }   /* green */
+.icon-edit { color: #2563eb; }   /* blue */
+.icon-delete { color: #dc2626; } /* red */
+
+/* Hover effects */
+.icon-view:hover { color: #15803d; }
+.icon-edit:hover { color: #1d4ed8; }
+.icon-delete:hover { color: #b91c1c; }
+
+.next-date-soon {
+  background-color: #fca5a5; /* light red */
+  color: #b91c1c;             /* dark red text */
+  font-weight: bold;
+}
+
+/* View Modal Styling */
+.view-section {
+  margin-bottom: 16px;
+}
+
+.view-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 3px;
+}
+
+.view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: 13px;
+}
+
+.view-item span {
+  color: #6b7280;
+}
+
+.view-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge-high { background:#dcfce7; color:#166534; }
+.badge-medium { background:#fef3c7; color:#92400e; }
+.badge-low { background:#fee2e2; color:#991b1b; }
+
+.view-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 13px;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.action-pill {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.flag-yes {
+  background: #dcfce7;
+  color: #166534;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.flag-no {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+.col-next-action {
+  max-width: 140px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+.button-group-right {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Investment Tracker</h1>
+
+  <div class="dashboard" id="dashboard"></div>
+
+<div class="buttons">
+  <button class="button button-blue" onclick="openModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;">
+      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+    </svg>
+    Add Investor
+  </button>
+  
+  <div class="button-group-right">
+    <button class="button button-green" onclick="exportCSV()">Export CSV</button>
+    <button id="update-csv-btn" class="button button-orange" onclick="updateCSV()" style="display:none;">Update CSV</button>
+    <button class="button button-purple" onclick="importCSV()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px;">
+        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+    </svg>
+    Import CSV
+    </button>
+    <input type="file" id="csvFile" style="display:none" accept=".csv">
+  </div>
+</div>
+
+  <div class="table-container">
+    <table id="investor-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Type</th>
+          <th>Check-Size</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th class="col-next-action">Next Action</th>
+          <th>Next Date</th>
+          <th>Interest</th>
+          <th class="contact-col">Primary Contact</th>
+          <th class="contact-col">Secondary Contact</th>
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Form -->
+<div class="modal" id="investor-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title">Add Investor</h2>
+      <span class="close-btn" onclick="closeModal()">X</span>
+    </div>
+    <form id="investor-form">
+      <input type="hidden" id="investor-id" value="">
+      <label>Name *</label><input type="text" id="name" required>
+      <label>Location</label><input type="text" id="location">
+      <label>Type</label>
+      <select id="type">
+        <option>Seed Fund</option>
+        <option>Angel Investor</option>
+        <option>Accelerator</option>
+        <option>Family Office</option>
+        <option>Strategic/Corporate VC</option>
+        <option>Micro VC</option>
+      </select>
+      <label>Check-Size</label><input type="text" id="amount">
+    <label>Intro Source</label>
+    <input type="text" id="introSource" placeholder="e.g. Warm via John">
+
+    <label>Connection Strength</label>
+    <select id="connectionStrength">
+    <option>Cold</option>
+    <option>2nd degree</option>
+    <option>Warm</option>
+    </select>
+
+    <label>Docs Sent</label>
+    <input type="text" id="docsSent" placeholder="Doc Name and Version"/>
+
+    <label>Verbal Commit</label>
+    <select id="verbalCommit">
+    <option value=""></option>
+    <option>Yes</option>
+    <option>No</option>
+    </select>
+
+    <label>Why Them</label>
+    <textarea id="whyThem" rows="2" placeholder="Specific reason why this investor is a good fit"></textarea>
+
+    <label>First Contact Date</label>
+    <input type="date" id="firstContactDate">
+
+    <label>Last Contact Date</label>
+    <input type="date" id="lastContactDate">
+
+    <label>Meeting Date/Time</label>
+    <input type="text" id="meetingDateTime" placeholder="e.g. 2026-01-28 2:00 PM">
+
+    <label>Key Concerns</label>
+    <textarea id="keyConcerns" rows="2"></textarea>
+
+      <label>Priority</label>
+      <select id="priority">
+        <option>A</option><option>B</option><option>C</option>
+      </select>
+      <label>Status</label><input type="text" id="status">
+    <label>Next Action</label>
+    <select id="nextAction">
+    <option value=""></option>
+    <option>Research investor</option>
+    <option>Get warm intro</option>
+    <option>Send initial email</option>
+    <option>Send follow-up #1</option>
+    <option>Send follow-up #2</option>
+    <option>Send deck</option>
+    <option>Schedule call</option>
+    <option>Take meeting</option>
+    <option>Send additional materials</option>
+    <option>Get decision</option>
+    <option>Close paperwork</option>
+    </select>
+      <label>Next Date</label><input type="date" id="nextDate">
+      <label>Interest</label>
+      <select id="interest">
+        <option></option>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+        <option>Passed</option>
+      </select>
+      <label>Primary Contact</label><input type="text" id="primaryContact">
+      <label>Secondary Contact</label><input type="text" id="secondaryContact">
+      <label>Email</label><input type="email" id="email">
+      <label>Website</label><input type="text" id="website">
+
+      <h3>Notes</h3>
+      <div class="note-list" id="note-list"></div>
+      <input type="date" id="note-date">
+      <input type="text" id="note-text" placeholder="Add note...">
+      <button type="button" class="button button-blue" onclick="addNote()">Add Note</button>
+
+      <div class="buttons" style="margin-top:10px;">
+        <button type="submit" class="button button-blue">Save</button>
+        <button type="button" class="button button-red" onclick="closeModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal" id="view-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Investor Details</h2>
+      <span class="close-btn" onclick="closeViewModal()">X</span>
+    </div>
+    <div id="view-content">
+      <!-- Details populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+
+let investors = [];
+let currentNotes = [];
+let contactsVisible = false;
+const columnKeyMap = [
+  'name',
+  'location',
+  'type',
+  'amount',
+  'priority',
+  'status',
+  'nextAction',
+  'nextDate',
+  'interest',
+  'primaryContact',
+  'secondaryContact',
+  'notes' // display column
+];
+
+// Add this near the top of your script, after the investors array declaration
+let savedFileHandle = null;
+let savedFileName = null;
+
+function updateButtonVisibility() {
+  const updateBtn = document.getElementById('update-csv-btn');
+  if (!updateBtn) return; // Safety check - exit if button doesn't exist
+  
+  if (typeof window.showSaveFilePicker === 'function') {
+    updateBtn.style.display = 'inline-block';
+  } else {
+    updateBtn.style.display = 'none';
+  }
+}
+
+function applyContactsVisibility() {
+  const table = document.getElementById('investor-table');
+  const headers = table.querySelectorAll('th');
+
+  let primaryIndex = Array.from(headers).findIndex(th => th.innerText === 'Primary Contact');
+  let secondaryIndex = Array.from(headers).findIndex(th => th.innerText === 'Secondary Contact');
+
+  // Update header visibility
+  if (primaryIndex >= 0) headers[primaryIndex].style.display = contactsVisible ? '' : 'none';
+  if (secondaryIndex >= 0) headers[secondaryIndex].style.display = contactsVisible ? '' : 'none';
+
+  // Update body cells visibility
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    if (primaryIndex >= 0) tr.children[primaryIndex].style.display = contactsVisible ? '' : 'none';
+    if (secondaryIndex >= 0) tr.children[secondaryIndex].style.display = contactsVisible ? '' : 'none';
+  });
+}
+
+function toggleContacts() {
+  contactsVisible = !contactsVisible;
+  applyContactsVisibility();
+}
+
+
+// Dashboard
+function renderDashboard(){
+  const total = investors.length;
+  const contacted = investors.filter(i=>i.status && i.status.trim()!=='').length;
+  const meetings = investors.filter(i=>i.nextAction && i.nextAction.toLowerCase().includes('meet')).length;
+  const interested = investors.filter(i=>['High','Medium'].includes(i.interest)).length;
+  /*const verbalCommits = investors.filter(i=>i.amount && i.amount.trim()!=='').length;
+  const totalCommitted = investors.reduce((sum,i)=>{
+    let val = i.amount?parseInt(i.amount.replace(/[^0-9]/g,''))||0:0;
+    return sum+val;
+  },0);
+  */
+  document.getElementById('dashboard').innerHTML = `
+    <div class="dash-card"><div class="title">Total Investors</div><div class="value">${total}</div></div>
+    <div class="dash-card"><div class="title">Contacted</div><div class="value">${contacted}</div></div>
+    <div class="dash-card"><div class="title">Meetings</div><div class="value">${meetings}</div></div>
+    <div class="dash-card"><div class="title">Interested</div><div class="value">${interested}</div></div>
+  `;
+  /*    
+    <div class="dash-card"><div class="title">Verbal Commits</div><div class="value">${verbalCommits}</div></div>
+    <div class="dash-card"><div class="title">$ Committed</div><div class="value">$${totalCommitted}K</div></div>
+  */
+}
+
+let sortOrder = {}; // track ascending/descending per column
+
+function sortTableByColumn(colKey) {
+
+  console.log("Col:"+colKey);
+  // toggle sort order for this column
+  sortOrder[colKey] = !sortOrder[colKey];
+
+  // Precompute sortable values
+    const prepared = investors.map(inv => {
+    let raw = inv[colKey];
+
+    // normalize empties early
+    if (raw == null || raw === '' || raw === 'N/A') {
+        return { inv, val: null };
+    }
+
+    // ISO date only
+    if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        return { inv, val: new Date(raw).getTime() };
+    }
+
+    // strict number check
+    const num = Number(raw);
+    if (Number.isFinite(num)) {
+        return { inv, val: num };
+    }
+
+    // fallback to lowercase string
+    return { inv, val: raw.toString().toLowerCase() };
+    });
+
+  // Sort the preprocessed array
+    prepared.sort((a, b) => {
+    if (a.val === '' && b.val !== '') return 1;
+    if (a.val !== '' && b.val === '') return -1;
+
+    if (a.val < b.val) return sortOrder[colKey] ? -1 : 1;
+    if (a.val > b.val) return sortOrder[colKey] ? 1 : -1;
+    return 0;
+    });
+  // Extract sorted investors
+  investors = prepared.map(p => p.inv);
+
+    console.log(
+    'Prepared order:',
+    prepared.map(p => ({
+        name: p.inv.name,
+        value: p.val
+    }))
+    );
+
+  renderTable();
+}
+
+let sortingEnabled = false;
+
+function enableSorting() {
+  if (sortingEnabled) return;
+  sortingEnabled = true;
+
+  const headers = document.querySelectorAll('#investor-table th');
+
+  headers.forEach((th, index) => {
+    th.style.cursor = 'pointer';
+
+    th.onclick = () => {
+      const colKey = columnKeyMap[index];
+      if (!colKey) return;
+      sortTableByColumn(colKey);
+    };
+  });
+}
+
+
+// Table
+function renderTable(){
+  const tbody = document.querySelector('#investor-table tbody');
+  tbody.innerHTML='';
+
+  const today = new Date();
+
+  investors.forEach(inv=>{
+    const tr = document.createElement('tr');
+
+    // Calculate class for Next Date
+    let nextDateClass = '';
+    if (inv.nextDate) {
+      const next = new Date(inv.nextDate);
+      const diffTime = next - today;
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      if (diffDays <= 3 && diffDays >= 0) {
+        nextDateClass = 'next-date-soon';
+      }
+    }
+
+    const notesText = inv.notes.map(n=>`[${n.date}] ${n.text}`).join('\n');
+    tr.innerHTML = `
+      <td>${inv.name}<div class="note-preview">${notesText}</div></td>
+      <td>${inv.location||''}</td>
+      <td>${inv.type||''}</td>
+      <td>${inv.amount||''}</td>
+      <td><span class="priority-${inv.priority||'C'}">${inv.priority||''}</span></td>
+      <td>${inv.status||''}</td>
+      <td class="col-next-action">${inv.nextAction ? `<span class="action-pill">${inv.nextAction}</span>` : ''}</td>
+      <td class="${nextDateClass}">${inv.nextDate||''}</td>
+      <td>${inv.interest?'<span class="interest-'+inv.interest+'">'+inv.interest+'</span>':''}</td>
+      <td>${inv.primaryContact||''}</td>
+      <td>${inv.secondaryContact||''}</td>
+      <td><div class="notes-cell">${notesText.replace(/\n/g,'<br>')}</div></td>
+      <td>
+        <button class="icon-btn icon-view" onclick="viewInvestor(${inv.id})" title="View">
+          <!-- Eye SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5zm0-8.333c-1.841 0-3.333 1.492-3.333 3.333s1.492 3.333 3.333 3.333 3.333-1.492 3.333-3.333-1.492-3.333-3.333-3.333z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn icon-edit" onclick="editInvestor(${inv.id})" title="Edit">
+          <!-- Pencil SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn icon-delete" onclick="deleteInvestor(${inv.id})" title="Delete">
+          <!-- Trash SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 6h18v2H3V6zm2 3h14v12H5V9zm4 2v8h2v-8H9zm4 0v8h2v-8h-2z"/>
+          </svg>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  renderDashboard();
+  applyContactsVisibility();
+  enableSorting();
+}
+
+
+
+// Modal
+window.openModal = function(){
+  document.getElementById('investor-form').reset();
+  document.getElementById('investor-id').value='';
+  currentNotes=[];
+  renderNotes();
+  document.getElementById('modal-title').innerText='Add Investor';
+  document.getElementById('investor-modal').style.display='flex';
+}
+window.closeModal = function(){ document.getElementById('investor-modal').style.display='none'; }
+
+function renderNotes(){
+  const noteList = document.getElementById('note-list');
+  noteList.innerHTML='';
+  currentNotes.forEach((n,i)=>{
+    const div = document.createElement('div');
+    div.className='note-item';
+    div.innerHTML = `[${n.date}] ${n.text} <span class="remove-note" onclick="removeNote(${i})">X</span>`;
+    noteList.appendChild(div);
+  });
+}
+function addNote(){
+  const date = document.getElementById('note-date').value;
+  const text = document.getElementById('note-text').value;
+  if(!date||!text){ alert('Enter date and note'); return; }
+  currentNotes.push({date,text});
+  renderNotes();
+  document.getElementById('note-date').value='';
+  document.getElementById('note-text').value='';
+}
+function removeNote(i){ currentNotes.splice(i,1); renderNotes(); }
+
+// CRUD
+document.getElementById('investor-form').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const id = document.getElementById('investor-id').value;
+  const numericId = id ? Number(id) : Date.now();
+
+  const inv = {
+    id: numericId,
+    originalIndex: id ? investors.find(i => i.id === numericId).originalIndex : investors.length, 
+    name: document.getElementById('name').value,
+    location: document.getElementById('location').value,
+    type: document.getElementById('type').value,
+    amount: document.getElementById('amount').value,
+    priority: document.getElementById('priority').value,
+    status: document.getElementById('status').value,
+    nextAction: document.getElementById('nextAction').value,
+    nextDate: document.getElementById('nextDate').value,
+    docsSent: document.getElementById('docsSent').value,
+    verbalCommit: document.getElementById('verbalCommit').value || 'No',
+    interest: document.getElementById('interest').value,
+    primaryContact: document.getElementById('primaryContact').value,
+    secondaryContact: document.getElementById('secondaryContact').value,
+    email: document.getElementById('email').value,
+    website: document.getElementById('website').value,
+    notes: [...currentNotes] || [],
+    introSource: document.getElementById('introSource').value,
+    connectionStrength: document.getElementById('connectionStrength').value,
+    whyThem: document.getElementById('whyThem').value,
+    firstContactDate: document.getElementById('firstContactDate').value,
+    lastContactDate: document.getElementById('lastContactDate').value,
+    meetingDateTime: document.getElementById('meetingDateTime').value,
+    keyConcerns: document.getElementById('keyConcerns').value
+  };
+
+  if(id){
+    const existing = investors.find(i => i.id === numericId);
+    if(existing){
+      Object.assign(existing, inv); // update in place
+    }
+  } else {
+    investors.push(inv);
+  }
+
+  closeModal();
+  renderTable();
+});
+
+window.editInvestor = function(id){
+  const inv = investors.find(i=>i.id==id);
+  document.getElementById('investor-id').value = inv.id;
+  document.getElementById('name').value = inv.name;
+  document.getElementById('location').value = inv.location;
+  document.getElementById('type').value = inv.type;
+  document.getElementById('amount').value = inv.amount;
+  document.getElementById('priority').value = inv.priority;
+  document.getElementById('status').value = inv.status;
+  document.getElementById('nextAction').value = inv.nextAction;
+  document.getElementById('nextDate').value = inv.nextDate;
+  document.getElementById('docsSent').value = inv.docsSent || '';
+  document.getElementById('verbalCommit').value = inv.verbalCommit || '';
+  document.getElementById('interest').value = inv.interest;
+  document.getElementById('primaryContact').value = inv.primaryContact;
+  document.getElementById('secondaryContact').value = inv.secondaryContact;
+  document.getElementById('email').value = inv.email;
+  document.getElementById('website').value = inv.website;
+document.getElementById('introSource').value = inv.introSource;
+document.getElementById('connectionStrength').value = inv.connectionStrength;
+document.getElementById('whyThem').value = inv.whyThem;
+document.getElementById('firstContactDate').value = inv.firstContactDate;
+document.getElementById('lastContactDate').value = inv.lastContactDate;
+document.getElementById('meetingDateTime').value = inv.meetingDateTime;
+document.getElementById('keyConcerns').value = inv.keyConcerns;
+  currentNotes = [...inv.notes];
+  renderNotes();
+  document.getElementById('modal-title').innerText='Edit Investor';
+  document.getElementById('investor-modal').style.display='flex';
+}
+
+window.deleteInvestor = function(id){
+  if(confirm('Are you sure?')){ investors = investors.filter(i=>i.id!=id); renderTable(); }
+}
+
+function viewInvestor(id) {
+  const inv = investors.find(i => i.id === id);
+  if (!inv) return;
+
+  const content = document.getElementById('view-content');
+content.innerHTML = `
+  <div class="view-section">
+    <div class="view-title">Overview</div>
+    <div class="view-grid">
+      <div class="view-item"><strong>Name:</strong> <span>${inv.name}</span></div>
+      <div class="view-item"><strong>Location:</strong> <span>${inv.location || '-'}</span></div>
+      <div class="view-item"><strong>Email:</strong> <span>${inv.email || '-'}</span></div>
+      <div class="view-item"><strong>Website:</strong> <span>${inv.website || '-'}</span></div>
+
+      <div class="view-item"><strong>Type:</strong> <span>${inv.type || '-'}</span></div>
+      <div class="view-item"><strong>Interest:</strong>
+        ${
+          inv.interest
+            ? `<span class="view-badge badge-${inv.interest.toLowerCase()}">${inv.interest}</span>`
+            : '-'
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="view-section">
+    <div class="view-title">Relationship</div>
+    <div class="view-grid">
+      <div class="view-item"><strong>Intro Source:</strong> <span>${inv.introSource || '-'}</span></div>
+      <div class="view-item"><strong>Connection:</strong> <span>${inv.connectionStrength || '-'}</span></div>
+      <div class="view-item"><strong>Primary Contact:</strong> <span>${inv.primaryContact || '-'}</span></div>
+      <div class="view-item"><strong>Secondary Contact:</strong> <span>${inv.secondaryContact || '-'}</span></div>
+    </div>
+  </div>
+
+  <div class="view-section">
+    <div class="view-title">Activity</div>
+    <div class="view-grid">
+      <div class="view-item"><strong>Status:</strong> <span>${inv.status || '-'}</span></div>
+      <div class="view-item"><strong>Next Action:</strong> <span>${inv.nextAction || '-'}</span></div>
+      <div class="view-item"><strong>Next Date:</strong> <span>${inv.nextDate || '-'}</span></div>
+      <div class="view-item"><strong>Docs Sent:</strong><span>${inv.docsSent || '-'}</span></div>
+      <div class="view-item"><strong>Verbal Commit:</strong><span>${inv.verbalCommit || '-'}</span></div>
+      <div class="view-item"><strong>Meeting:</strong> <span>${inv.meetingDateTime || '-'}</span></div>
+      <div class="view-item"><strong>First Contact:</strong> <span>${inv.firstContactDate || '-'}</span></div>
+      <div class="view-item"><strong>Last Contact:</strong> <span>${inv.lastContactDate || '-'}</span></div>
+    </div>
+  </div>
+
+  <div class="view-section">
+    <div class="view-title">Why Them</div>
+    <div class="view-box">${inv.whyThem || '—'}</div>
+  </div>
+
+  <div class="view-section">
+    <div class="view-title">Key Concerns</div>
+    <div class="view-box">${inv.keyConcerns || '—'}</div>
+  </div>
+
+  <div class="view-section">
+    <div class="view-title">Notes</div>
+    <div class="view-box">
+      ${
+        inv.notes.length
+          ? inv.notes.map(n => `[${n.date}] ${n.text}`).join('\n')
+          : '—'
+      }
+    </div>
+  </div>
+`;
+
+
+  document.getElementById('view-modal').style.display = 'flex';
+}
+
+function closeViewModal() {
+  document.getElementById('view-modal').style.display = 'none';
+}
+
+// CSV Export
+window.exportCSV = async function(){
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g,'-');
+
+  // reorder by original index
+  const ordered = [...investors].sort((a,b)=> a.originalIndex - b.originalIndex);
+    let csv = 'Name,Location,Type,Check-Size,Priority,Status,Next Action,Next Date,Interest,Primary Contact,Secondary Contact,Email,Website,Intro Source,Connection Strength,Why Them,First Contact Date,Last Contact Date,Meeting Date/Time,Key Concerns,Docs Sent,Verbal Commit,Notes\n';
+
+    ordered.forEach(i=>{
+    const notesText = i.notes.map(n=>`${n.date}: ${n.text}`).join(' | ');
+    csv += `"${i.name}","${i.location}","${i.type}","${i.amount}","${i.priority}","${i.status}","${i.nextAction}","${i.nextDate}","${i.interest}","${i.primaryContact}","${i.secondaryContact}","${i.email}","${i.website}","${i.introSource || ''}","${i.connectionStrength || ''}","${i.whyThem || ''}","${i.firstContactDate || ''}","${i.lastContactDate || ''}","${i.meetingDateTime || ''}","${i.keyConcerns || ''}","${i.docsSent || ''}","${i.verbalCommit || ''}","${notesText}"\n`;
+    });
+
+  // Use saved filename if available, otherwise use timestamp
+  let filename = savedFileName != null ? savedFileName : `investors_${timestamp}.csv`;
+
+  // Try to use File System Access API if available
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: 'CSV Files',
+          accept: {'text/csv': ['.csv']},
+        }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(csv);
+      await writable.close();
+      // Save the file handle for future updates
+      savedFileHandle = handle;
+      updateButtonVisibility();
+      return;
+    } catch (err) {
+      // User cancelled the save dialog
+      if (err.name === 'AbortError') {
+        console.log('User cancelled save');
+        return; // Exit without doing the fallback download
+      }
+      // Other errors - fall through to fallback
+      console.log('File picker error:', err);
+    }
+  }
+
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `investors_${timestamp}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Function to update the existing file
+window.updateCSV = async function(){
+  // If no file handle exists, automatically export instead
+  if (!savedFileHandle) {
+    await exportCSV();
+    return;
+  }
+
+  const ordered = [...investors].sort((a,b)=> a.originalIndex - b.originalIndex);
+  
+  let csv = 'Name,Location,Type,Check-Size,Priority,Status,Next Action,Next Date,Interest,Primary Contact,Secondary Contact,Email,Website,Intro Source,Connection Strength,Why Them,First Contact Date,Last Contact Date,Meeting Date/Time,Key Concerns,Docs Sent,Verbal Commit,Notes\n';
+  
+  ordered.forEach(i=>{
+    const notesText = i.notes.map(n=>`${n.date}: ${n.text}`).join(' | ');
+    csv += `"${i.name}","${i.location}","${i.type}","${i.amount}","${i.priority}","${i.status}","${i.nextAction}","${i.nextDate}","${i.interest}","${i.primaryContact}","${i.secondaryContact}","${i.email}","${i.website}","${i.introSource || ''}","${i.connectionStrength || ''}","${i.whyThem || ''}","${i.firstContactDate || ''}","${i.lastContactDate || ''}","${i.meetingDateTime || ''}","${i.keyConcerns || ''}","${i.docsSent || ''}","${i.verbalCommit || ''}","${notesText}"\n`;
+  });
+
+  try {
+    const writable = await savedFileHandle.createWritable();
+    await writable.write(csv);
+    await writable.close();
+    
+    const filename = savedFileHandle.name;
+    alert(`"${filename}" updated successfully!`);
+  } catch (err) {
+    alert('Failed to update file: ' + err.message);
+    savedFileHandle = null;
+    updateButtonVisibility();
+  }
+}
+
+// CSV Load
+document.getElementById('csvFile').addEventListener('change',function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  // Extract filename without extension
+  savedFileName = file.name;
+  console.log("FileName:"+savedFileName);
+
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    const text = evt.target.result;
+    parseCSV(text);
+    renderTable();
+  };
+  reader.readAsText(file);
+});
+
+/*
+function parseCSV(text){
+  const lines = text.split('\n').filter(l=>l.trim());
+  lines.shift(); // remove header
+
+  investors = lines.map(l=>{
+    const cols = l
+  .match(/(".*?"|[^,]+)(?=,|$)/g)       // match anything in quotes OR anything up to a comma
+  .map(c => c.trim().replace(/^"|"$/g,'')); // remove quotes and trim spaces
+
+    return {
+      id: Date.now() + Math.floor(Math.random() * 1000),
+
+      name: cols[0],
+      location: cols[1],
+      type: cols[2],
+      amount: cols[3],
+      priority: cols[4],
+      status: cols[5],
+      nextAction: cols[6],
+      nextDate: cols[7],
+      interest: cols[8],
+
+      primaryContact: cols[9],
+      secondaryContact: cols[10],
+      email: cols[11],
+      website: cols[12],
+
+      introSource: cols[13],
+      connectionStrength: cols[14],
+      whyThem: cols[15],
+      firstContactDate: cols[16],
+      lastContactDate: cols[17],
+      meetingDateTime: cols[18],
+      keyConcerns: cols[19],
+      docsSent: cols[20],
+      verbalCommit: cols[21],
+notes: cols[22]
+  ? (() => {
+      const [firstNote] = cols[22].split(' | ');
+      const [date, ...text] = firstNote.split(': ');
+      return [{ date, text: text.join(': ') }];
+    })()
+  : []
+    };
+  });
+}
+*/
+
+
+function parseCSV(text){
+  const lines = text.split('\n').filter(l=>l.trim());
+  lines.shift(); // remove header
+
+  investors = lines.map((l, idx)=>{
+    const cols = l
+      .match(/(".*?"|[^,]+)(?=,|$)/g)       // match anything in quotes OR anything up to a comma
+      .map(c => c.trim().replace(/^"|"$/g,'')); // remove quotes and trim spaces
+
+    return {
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      originalIndex: idx, // keep the original order
+      name: cols[0],
+      location: cols[1],
+      type: cols[2],
+      amount: cols[3],
+      priority: cols[4],
+      status: cols[5],
+      nextAction: cols[6],
+      nextDate: cols[7],
+      interest: cols[8],
+
+      primaryContact: cols[9],
+      secondaryContact: cols[10],
+      email: cols[11],
+      website: cols[12],
+
+      introSource: cols[13],
+      connectionStrength: cols[14],
+      whyThem: cols[15],
+      firstContactDate: cols[16],
+      lastContactDate: cols[17],
+      meetingDateTime: cols[18],
+      keyConcerns: cols[19],
+      docsSent: cols[20],
+      verbalCommit: cols[21],
+      notes: cols[22]
+        ? (() => {
+            const [firstNote] = cols[22].split(' | ');
+            const [date, ...text] = firstNote.split(': ');
+            return [{ date, text: text.join(': ') }];
+          })()
+        : []
+    };
+  });
+}
+
+// Import CSV with file handle
+window.importCSV = async function() {
+  // Try to use File System Access API first
+  if ('showOpenFilePicker' in window) {
+    try {
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [{
+          description: 'CSV Files',
+          accept: {'text/csv': ['.csv']},
+        }],
+        multiple: false
+      });
+      
+      // Save the file handle for updates
+      savedFileHandle = fileHandle;
+      
+      // Extract filename without extension and save it
+      const fileName = fileHandle.name.replace(/\.csv$/i, '');
+      savedFileName = fileName;
+      
+      // Read the file
+      const file = await fileHandle.getFile();
+      const text = await file.text();
+      
+      parseCSV(text);
+      renderTable();
+      updateButtonVisibility();
+      
+      //alert(`Imported "${fileHandle.name}" successfully! You can now use "Update CSV" to save changes directly to this file.`);
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        console.log('User cancelled import');
+        return;
+      }
+      console.log('File picker error:', err);
+    }
+  }
+  
+  // Fallback: trigger the hidden file input for browsers without API support
+  document.getElementById('csvFile').click();
+}
+
+
+window.onload = function(){
+  renderTable();
+  updateButtonVisibility(); 
+};
+</script>
+
+</body>
+</html>
