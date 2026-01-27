@@ -668,9 +668,20 @@ document.getElementById('investor-form').addEventListener('submit', function(e){
     const existing = investors.find(i => i.id === numericId);
     if(existing){
       Object.assign(existing, inv); // update in place
+      // Move to top
+      investors = investors.filter(i => i.id !== numericId);
+      investors.unshift(existing);
+      // Recalculate originalIndex for all items
+      investors.forEach((inv, idx) => {
+        inv.originalIndex = idx;
+      });
     }
   } else {
-    investors.push(inv);
+    investors.unshift(inv); // Add to beginning instead of end
+    // Recalculate originalIndex for all items
+    investors.forEach((inv, idx) => {
+      inv.originalIndex = idx;
+    });
   }
 
   closeModal();
