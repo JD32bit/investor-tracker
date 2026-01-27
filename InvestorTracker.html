@@ -435,7 +435,7 @@ function toggleContacts() {
 function renderDashboard(){
   const total = investors.length;
   const contacted = investors.filter(i=>i.status && i.status.trim()!=='').length;
-  const meetings = investors.filter(i=>i.nextAction && i.nextAction.toLowerCase().includes('meet')).length;
+  const meetings = investors.filter(i=>i.meetingDateTime && i.meetingDateTime.trim()!=='').length;
   const interested = investors.filter(i=>['High','Medium'].includes(i.interest)).length;
   /*const verbalCommits = investors.filter(i=>i.amount && i.amount.trim()!=='').length;
   const totalCommitted = investors.reduce((sum,i)=>{
