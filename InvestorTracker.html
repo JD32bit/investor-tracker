@@ -773,13 +773,11 @@ content.innerHTML = `
 
   <div class="view-section">
     <div class="view-title">Notes</div>
-    <div class="view-box">
-      ${
+    <div class="view-box">${
         inv.notes.length
           ? inv.notes.map(n => `[${n.date}] ${n.text}`).join('\n')
           : '—'
-      }
-    </div>
+      }</div>
   </div>
 `;
 
@@ -980,11 +978,10 @@ function parseCSV(text){
       docsSent: cols[20],
       verbalCommit: cols[21],
       notes: cols[22]
-        ? (() => {
-            const [firstNote] = cols[22].split(' | ');
-            const [date, ...text] = firstNote.split(': ');
-            return [{ date, text: text.join(': ') }];
-          })()
+        ? cols[22].split(' | ').map(noteStr => {
+            const [date, ...text] = noteStr.split(': ');
+            return { date, text: text.join(': ') };
+          })
         : []
     };
   });
