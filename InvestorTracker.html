@@ -734,9 +734,18 @@ content.innerHTML = `
     <div class="view-grid">
       <div class="view-item"><strong>Name:</strong> <span>${inv.name}</span></div>
       <div class="view-item"><strong>Location:</strong> <span>${inv.location || '-'}</span></div>
-      <div class="view-item"><strong>Email:</strong> <span>${inv.email || '-'}</span></div>
-      <div class="view-item"><strong>Website:</strong> <span>${inv.website || '-'}</span></div>
-
+      <div class="view-item">
+        <strong>Email:</strong>
+        <span>
+          ${inv.email ? `<a href="mailto:${inv.email}">${inv.email}</a>` : '-'}
+        </span>
+      </div>
+      <div class="view-item">
+        <strong>Website:</strong>
+        <span>
+          ${inv.website ? `<a href="${inv.website}" target="_blank" rel="noopener noreferrer">${inv.website}</a>` : '-'}
+        </span>
+      </div>
       <div class="view-item"><strong>Type:</strong> <span>${inv.type || '-'}</span></div>
       <div class="view-item"><strong>Interest:</strong>
         ${
