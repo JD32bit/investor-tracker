@@ -632,7 +632,17 @@ function removeNote(i){ currentNotes.splice(i,1); renderNotes(); }
 // CRUD
 document.getElementById('investor-form').addEventListener('submit', function(e){
   e.preventDefault();
-
+  
+  // --- Auto-add note if textarea has text ---
+  const notesTextarea = document.getElementById('note-text').value;
+  const notesdate = document.getElementById('note-date').value;
+  if (notesTextarea) {
+    addNote();
+    if(!notesdate){
+      return;
+    }
+  }
+  
   const id = document.getElementById('investor-id').value;
   const numericId = id ? Number(id) : Date.now();
 
